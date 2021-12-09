@@ -29,7 +29,7 @@ const releaseElem = (id) => {
 
 const registerAnchor = (id) => {
     if (!storeAnchors[id]) {
-        storeAnchors[id] = 1
+        storeAnchors[id] = 0
     }
 
     storeAnchors[id] += 1
@@ -47,7 +47,7 @@ const unregisterAnchor = (id) => {
 
 const registerPortal = (id) => {
     if (!storePortals[id]) {
-        storePortals[id] = 1
+        storePortals[id] = 0
     }
 
     storePortals[id] += 1
