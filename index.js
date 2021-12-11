@@ -2,6 +2,7 @@ import React, {useLayoutEffect, useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 
 const DID_MOUNT_CUSTOM_EVENT = 'didMountCustomEvent'
+const DID_UNMOUNT_CUSTOM_EVENT = 'didUnmountCustomEvent'
 
 const storeElems = {}
 
@@ -70,13 +71,16 @@ export const Portal = (props) => {
 
     useLayoutEffect(() => {
         const handleMount = () => setMounted(true)
+        const handleUnmount = () => setMounted(false)
 
         elem.current.addEventListener(DID_MOUNT_CUSTOM_EVENT, handleMount)
+        elem.current.addEventListener(DID_UNMOUNT_CUSTOM_EVENT, handleUnmount)
 
         registerPortal(id)
 
         return () => {
             elem.current.removeEventListener(DID_MOUNT_CUSTOM_EVENT, handleMount)
+            elem.current.removeEventListener(DID_UNMOUNT_CUSTOM_EVENT, handleUnmount)
 
             unregisterPortal(id)
 
@@ -102,6 +106,10 @@ export const Anchor = (props) => {
         registerAnchor(id)
 
         return () => {
+            const customDidUnmountEvent = new CustomEvent(DID_UNMOUNT_CUSTOM_EVENT)
+
+            elem.current.dispatchEvent(customDidUnmountEvent)
+
             unregisterAnchor(id)
 
             releaseElem(id)
