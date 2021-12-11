@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from "react";
+import React, {useLayoutEffect, useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 
 const DID_MOUNT_CUSTOM_EVENT = 'didMountCustomEvent'
@@ -92,7 +92,7 @@ export const Anchor = (props) => {
     const ref = useRef(null)
     const elem = useRef(requireElem(id))
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         ref.current.appendChild(elem.current)
 
         const customDidMountEvent = new CustomEvent(DID_MOUNT_CUSTOM_EVENT)
