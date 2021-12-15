@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 const DID_MOUNT_CUSTOM_EVENT = 'didMountCustomEvent'
 const DID_UNMOUNT_CUSTOM_EVENT = 'didUnmountCustomEvent'
 const ANCHOR_PROPS_DID_UPDATE_EVENT = 'anchorPropsDidUpdateEvent'
-const PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT = 'portalMounetAndNeedsAnchorEvent'
+const PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT = 'portalMountedAndNeedsAnchorPropsEvent'
 
 const storeElems = {}
 
