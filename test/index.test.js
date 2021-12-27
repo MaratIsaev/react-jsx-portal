@@ -6,176 +6,176 @@ import { App } from './app.test'
 let root = null
 
 beforeEach(() => {
-    document.body.innerHTML = null
-    // подготавливаем DOM-элемент, куда будем рендерить
-    root = document.createElement('div')
-    document.body.appendChild(root)
+  document.body.innerHTML = null
+  // подготавливаем DOM-элемент, куда будем рендерить
+  root = document.createElement('div')
+  document.body.appendChild(root)
 })
 
 test('Anchor и Portal появляются одновременно, но Anchor выше в дереве', () => {
-    const INIT_COUNT = 12345
+  const INIT_COUNT = 12345
 
-    act(() => {
-        render(<App initCount={INIT_COUNT} anchorFirst />, root)
-    })
+  act(() => {
+    render(<App initCount={INIT_COUNT} anchorFirst />, root)
+  })
 
-    //Проверяем, что портал появился
-    let portal = document.querySelector('#counter')
+  //Проверяем, что портал появился
+  let portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    //Проверяем, что значение count равно начальному
-    let count = document.querySelector('#count')
+  //Проверяем, что значение count равно начальному
+  let count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT))
+  expect(count.innerHTML).toBe(String(INIT_COUNT))
 
-    //Проверяем что пропсы нормально передались в Portal
-    //Для этого сначала увеличим счетчик
-    let increase = document.querySelector('#increase')
+  //Проверяем что пропсы нормально передались в Portal
+  //Для этого сначала увеличим счетчик
+  let increase = document.querySelector('#increase')
 
-    increase.click()
+  increase.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT + 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT + 1))
 
-    //Потом уменьшим
-    const decrease = document.querySelector('#decrease')
+  //Потом уменьшим
+  const decrease = document.querySelector('#decrease')
 
-    decrease.click()
-    decrease.click()
+  decrease.click()
+  decrease.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    //Скрыть Anchor проверить что Portal пропал
-    const close = document.querySelector('#close')
+  //Скрыть Anchor проверить что Portal пропал
+  const close = document.querySelector('#close')
 
-    close.click()
+  close.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).not.toBe
+  expect(portal).not.toBe
 
-    //Показать Anchor проверить, что Portal появился
-    const openAnchor = document.querySelector('#openAnchor')
+  //Показать Anchor проверить, что Portal появился
+  const openAnchor = document.querySelector('#openAnchor')
 
-    openAnchor.click()
+  openAnchor.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    count = document.querySelector('#count')
+  count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    //Прячем Portal
-    const closePortal = document.querySelector('#closePortal')
+  //Прячем Portal
+  const closePortal = document.querySelector('#closePortal')
 
-    closePortal.click()
+  closePortal.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).not.toBe
+  expect(portal).not.toBe
 
-    //Показываем Portal
-    const openPortal = document.querySelector('#openPortal')
+  //Показываем Portal
+  const openPortal = document.querySelector('#openPortal')
 
-    openPortal.click()
+  openPortal.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    count = document.querySelector('#count')
+  count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    increase = document.querySelector('#increase')
+  increase = document.querySelector('#increase')
 
-    increase.click()
+  increase.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT))
+  expect(count.innerHTML).toBe(String(INIT_COUNT))
 })
 
 test('Anchor и Portal появляются одновременно, но Portal выше в дереве', () => {
-    const INIT_COUNT = 12345
+  const INIT_COUNT = 12345
 
-    act(() => {
-        render(<App initCount={INIT_COUNT} />, root)
-    })
+  act(() => {
+    render(<App initCount={INIT_COUNT} />, root)
+  })
 
-    //Проверяем, что портал появился
-    let portal = document.querySelector('#counter')
+  //Проверяем, что портал появился
+  let portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    //Проверяем, что значение count равно начальному
-    let count = document.querySelector('#count')
+  //Проверяем, что значение count равно начальному
+  let count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT))
+  expect(count.innerHTML).toBe(String(INIT_COUNT))
 
-    //Проверяем что пропсы нормально передались в Portal
-    //Для этого сначала увеличим счетчик
-    let increase = document.querySelector('#increase')
+  //Проверяем что пропсы нормально передались в Portal
+  //Для этого сначала увеличим счетчик
+  let increase = document.querySelector('#increase')
 
-    increase.click()
+  increase.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT + 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT + 1))
 
-    //Потом уменьшим
-    const decrease = document.querySelector('#decrease')
+  //Потом уменьшим
+  const decrease = document.querySelector('#decrease')
 
-    decrease.click()
-    decrease.click()
+  decrease.click()
+  decrease.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    //Скрыть Anchor проверить что Portal пропал
-    const close = document.querySelector('#close')
+  //Скрыть Anchor проверить что Portal пропал
+  const close = document.querySelector('#close')
 
-    close.click()
+  close.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).not.toBe
+  expect(portal).not.toBe
 
-    //Показать Anchor проверить, что Portal появился
-    const openAnchor = document.querySelector('#openAnchor')
+  //Показать Anchor проверить, что Portal появился
+  const openAnchor = document.querySelector('#openAnchor')
 
-    openAnchor.click()
+  openAnchor.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    count = document.querySelector('#count')
+  count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    //Прячем Portal
-    const closePortal = document.querySelector('#closePortal')
+  //Прячем Portal
+  const closePortal = document.querySelector('#closePortal')
 
-    closePortal.click()
+  closePortal.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).not.toBe
+  expect(portal).not.toBe
 
-    //Показываем Portal
-    const openPortal = document.querySelector('#openPortal')
+  //Показываем Portal
+  const openPortal = document.querySelector('#openPortal')
 
-    openPortal.click()
+  openPortal.click()
 
-    portal = document.querySelector('#counter')
+  portal = document.querySelector('#counter')
 
-    expect(portal).toBe
+  expect(portal).toBe
 
-    count = document.querySelector('#count')
+  count = document.querySelector('#count')
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
-    increase = document.querySelector('#increase')
+  increase = document.querySelector('#increase')
 
-    increase.click()
+  increase.click()
 
-    expect(count.innerHTML).toBe(String(INIT_COUNT))
+  expect(count.innerHTML).toBe(String(INIT_COUNT))
 })
