@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {Anchor, Portal} from '../src'
 
 const Counter = (props) => {

@@ -1,5 +1,5 @@
-import React, {useLayoutEffect, useEffect, useRef, useState, useCallback} from "react";
-import ReactDOM from "react-dom";
+import React, {useLayoutEffect, useEffect, useRef, useState, useCallback} from 'react'
+import ReactDOM from 'react-dom'
 
 const DID_MOUNT_CUSTOM_EVENT = 'didMountCustomEvent'
 const DID_UNMOUNT_CUSTOM_EVENT = 'didUnmountCustomEvent'

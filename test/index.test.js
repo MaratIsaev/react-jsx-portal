@@ -1,16 +1,16 @@
-import React from 'react';
-import { act } from "react-dom/test-utils";
-import { render } from "react-dom";
-import { App } from "./app.test";
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+import { render } from 'react-dom'
+import { App } from './app.test'
 
-let root = null;
+let root = null
 
 beforeEach(() => {
-    document.body.innerHTML = null;
+    document.body.innerHTML = null
     // подготавливаем DOM-элемент, куда будем рендерить
-    root = document.createElement("div");
-    document.body.appendChild(root);
-});
+    root = document.createElement('div')
+    document.body.appendChild(root)
+})
 
 test('Anchor и Portal появляются одновременно, но Anchor выше в дереве', () => {
     const INIT_COUNT = 12345
