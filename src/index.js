@@ -105,7 +105,7 @@ export const Portal = (props) => {
 }
 
 export const Anchor = (props) => {
-    const { id, ...restProps } = props
+    const { id } = props
     const ref = useRef(null)
     const elem = useRef(requireElem(id))
     const refProps = useRef(props)
@@ -145,5 +145,5 @@ export const Anchor = (props) => {
         }
     }, [])
 
-    return React.createElement('div', { ref, ...restProps })
+    return React.createElement('div', { ref })
 }
