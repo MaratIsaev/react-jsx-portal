@@ -3,6 +3,8 @@ import { act } from 'react-dom/test-utils'
 import { render } from 'react-dom'
 import { App } from './app.test'
 
+const INIT_COUNT = 12345
+
 let root = null
 
 beforeEach(() => {
@@ -10,6 +12,12 @@ beforeEach(() => {
   // подготавливаем DOM-элемент, куда будем рендерить
   root = document.createElement('div')
   document.body.appendChild(root)
+})
+
+afterEach(() => {
+  act(() => {
+    render(null, root)
+  })
 })
 
 test('Anchor и Portal появляются одновременно, но Anchor выше в дереве', () => {
@@ -46,7 +54,7 @@ test('Anchor и Portal появляются одновременно, но Ancho
   expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
   //Скрыть Anchor проверить что Portal пропал
-  const close = document.querySelector('#close')
+  let close = document.querySelector('#close')
 
   close.click()
 
@@ -68,7 +76,7 @@ test('Anchor и Portal появляются одновременно, но Ancho
   expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
 
   //Прячем Portal
-  const closePortal = document.querySelector('#closePortal')
+  let closePortal = document.querySelector('#closePortal')
 
   closePortal.click()
 
@@ -97,8 +105,6 @@ test('Anchor и Portal появляются одновременно, но Ancho
 })
 
 test('Anchor и Portal появляются одновременно, но Portal выше в дереве', () => {
-  const INIT_COUNT = 12345
-
   act(() => {
     render(<App initCount={INIT_COUNT} />, root)
   })

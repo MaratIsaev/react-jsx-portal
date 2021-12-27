@@ -6,6 +6,24 @@ const DID_UNMOUNT_CUSTOM_EVENT = 'didUnmountCustomEvent'
 const ANCHOR_PROPS_DID_UPDATE_EVENT = 'anchorPropsDidUpdateEvent'
 const PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT = 'portalMountedAndNeedsAnchorPropsEvent'
 
+const registerInStore = (store) => (id) => {
+  if (!store[id]) {
+    store[id] = 0
+  }
+
+  store[id] += 1
+}
+
+const unregisterInStore = (store) => (id) => {
+  if (store[id]) {
+    store[id] -= 1
+  }
+
+  if (store[id] === 0) {
+    delete store[id]
+  }
+}
+
 const storeElems = {}
 
 const storeAnchors = {}
@@ -30,41 +48,13 @@ const releaseElem = (id) => {
   }
 }
 
-const registerAnchor = (id) => {
-  if (!storeAnchors[id]) {
-    storeAnchors[id] = 0
-  }
+const registerAnchor = registerInStore(storeAnchors)
 
-  storeAnchors[id] += 1
-}
+const unregisterAnchor = unregisterInStore(storeAnchors)
 
-const unregisterAnchor = (id) => {
-  if (storeAnchors[id]) {
-    storeAnchors[id] -= 1
-  }
+const registerPortal = registerInStore(storePortals)
 
-  if (storeAnchors[id] === 0) {
-    delete storeAnchors[id]
-  }
-}
-
-const registerPortal = (id) => {
-  if (!storePortals[id]) {
-    storePortals[id] = 0
-  }
-
-  storePortals[id] += 1
-}
-
-const unregisterPortal = (id) => {
-  if (storePortals[id]) {
-    storePortals[id] -= 1
-  }
-
-  if (storePortals[id] === 0) {
-    delete storePortals[id]
-  }
-}
+const unregisterPortal = unregisterInStore(storePortals)
 
 export const Portal = (props) => {
   const { render, id } = props
