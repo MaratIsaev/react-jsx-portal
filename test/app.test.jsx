@@ -21,9 +21,9 @@ const Counter = (props) => {
 }
 
 export const App = (props) => {
-  const { initCount, anchorFirst } = props
-  const [isAnchorVisible, setIsAnchorVisible] = useState(true)
-  const [isPortalVisible, setIsPortalVisible] = useState(true)
+  const { initCount, anchorFirst, id, anchorVisible, portalVisible } = props
+  const [isAnchorVisible, setIsAnchorVisible] = useState(anchorVisible)
+  const [isPortalVisible, setIsPortalVisible] = useState(portalVisible)
   const [count, setCount] = useState(initCount)
   const handlePortalClose = () => setIsAnchorVisible(false)
 
@@ -41,10 +41,10 @@ export const App = (props) => {
       </button>
       {anchorFirst ? (
         <>
-          {isAnchorVisible && <Anchor id="1" count={count} setCount={setCount} onClose={handlePortalClose} />}
+          {isAnchorVisible && <Anchor id={id} count={count} setCount={setCount} onClose={handlePortalClose} />}
           {isPortalVisible && (
             <Portal
-              id="1"
+              id={id}
               render={({ count, setCount, handlePortalClose }) => (
                 <Counter count={count} setCount={setCount} onClose={handlePortalClose} />
               )}
@@ -55,13 +55,13 @@ export const App = (props) => {
         <>
           {isPortalVisible && (
             <Portal
-              id="1"
+              id={id}
               render={({ count, setCount, handlePortalClose }) => (
                 <Counter count={count} setCount={setCount} onClose={handlePortalClose} />
               )}
             />
           )}
-          {isAnchorVisible && <Anchor id="1" count={count} setCount={setCount} onClose={handlePortalClose} />}
+          {isAnchorVisible && <Anchor id={id} count={count} setCount={setCount} onClose={handlePortalClose} />}
         </>
       )}
     </div>

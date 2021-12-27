@@ -30,6 +30,14 @@ const storeAnchors = {}
 
 const storePortals = {}
 
+if (process.env.NODE_ENV === 'test') {
+  global.anchorAndPortalStores = {
+    storeElems,
+    storeAnchors,
+    storePortals,
+  }
+}
+
 const requireElem = (id) => {
   if (!storeElems[id]) {
     const div = document.createElement('div')

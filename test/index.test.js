@@ -4,6 +4,7 @@ import { render } from 'react-dom'
 import { App } from './app.test'
 
 const INIT_COUNT = 12345
+const ID = 'someId'
 
 let root = null
 
@@ -21,10 +22,8 @@ afterEach(() => {
 })
 
 test('Anchor и Portal появляются одновременно, но Anchor выше в дереве', () => {
-  const INIT_COUNT = 12345
-
   act(() => {
-    render(<App initCount={INIT_COUNT} anchorFirst />, root)
+    render(<App id={ID} anchorVisible portalVisible initCount={INIT_COUNT} anchorFirst />, root)
   })
 
   //Проверяем, что портал появился
@@ -106,7 +105,7 @@ test('Anchor и Portal появляются одновременно, но Ancho
 
 test('Anchor и Portal появляются одновременно, но Portal выше в дереве', () => {
   act(() => {
-    render(<App initCount={INIT_COUNT} />, root)
+    render(<App id={ID} anchorVisible portalVisible initCount={INIT_COUNT} />, root)
   })
 
   //Проверяем, что портал появился
@@ -184,4 +183,57 @@ test('Anchor и Portal появляются одновременно, но Porta
   increase.click()
 
   expect(count.innerHTML).toBe(String(INIT_COUNT))
+})
+
+test('Проверяем что сторы очищаются корректно и нет утечек памяти', () => {
+  const {
+    storeElems,
+    storeAnchors,
+    storePortals,
+  } = global.anchorAndPortalStores
+
+  //Изначально в сторах ничего нет
+  expect(storeElems[ID]).not.toBe
+  expect(storeAnchors[ID]).not.toBe
+  expect(storePortals[ID]).not.toBe
+
+  //Монтируем компонент
+  act(() => {
+    render(<App id={ID} anchorVisible portalVisible initCount={INIT_COUNT} anchorFirst />, root)
+  })
+
+  //После того как отрендерили один Portal и один Anchor
+  expect(storeElems[ID]).toBe
+  expect(storeAnchors[ID]).toBe(1)
+  expect(storePortals[ID]).toBe(1)
+
+  //Скрываем Portal
+  act(() => {
+    render(<App id={ID} anchorVisible initCount={INIT_COUNT} anchorFirst />, root)
+  })
+
+  //После того как скрыли Portal
+  expect(storeElems[ID]).toBe
+  expect(storeAnchors[ID]).toBe(1)
+  expect(storePortals[ID]).not.toBe
+
+  //Скрываем Anchor
+  act(() => {
+    render(<App id={ID} portalVisible initCount={INIT_COUNT} anchorFirst />, root)
+  })
+
+  //После того как скрыли Anchor
+  expect(storeElems[ID]).toBe
+  expect(storeAnchors[ID]).not.toBe
+  expect(storePortals[ID]).toBe(1)
+
+  //Скрываем Anchor и Portal
+  act(() => {
+    render(<App id={ID} initCount={INIT_COUNT} anchorFirst />, root)
+  })
+
+  //После того как скрыли Portal и Anchor в сторах ничего не должно оставаться
+  expect(storeElems[ID]).not.toBe
+  expect(storeAnchors[ID]).not.toBe
+  expect(storePortals[ID]).not.toBe
 })
