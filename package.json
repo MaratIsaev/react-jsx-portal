@@ -1,8 +1,9 @@
 {
-  "name": "@react/portal",
+  "name": "@isaev/portal",
   "version": "1.0.0",
   "description": "Simplifies working with Portal. Simplifies the creation of complex ui layouts.",
   "main": "dist/index.js",
+  "files": ["dist"],
   "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
   "keywords": [
