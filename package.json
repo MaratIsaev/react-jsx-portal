@@ -1,10 +1,17 @@
 {
-  "name": "portal",
+  "name": "@react/portal",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simplifies working with Portal. Simplifies the creation of complex ui layouts.",
   "main": "dist/index.js",
-  "author": "",
+  "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
+  "keywords": [
+    "react",
+    "react-component",
+    "modal",
+    "react-portal",
+    "portal"
+  ],
   "scripts": {
     "build": "NODE_ENV=production webpack",
     "test": "NODE_ENV=test jest test/index.test.js",
