@@ -1,147 +1,100 @@
-import React, { useLayoutEffect, useEffect, useRef, useState, useCallback } from 'react'
+import React, { useLayoutEffect, useEffect, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom'
+import { v4 as uuidv4 } from 'uuid'
 
-const DID_MOUNT_CUSTOM_EVENT = 'didMountCustomEvent'
-const DID_UNMOUNT_CUSTOM_EVENT = 'didUnmountCustomEvent'
-const ANCHOR_PROPS_DID_UPDATE_EVENT = 'anchorPropsDidUpdateEvent'
-const PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT = 'portalMountedAndNeedsAnchorPropsEvent'
+const anchorsRenderFuncs = {}
 
-const registerInStore = (store) => (id) => {
-  if (!store[id]) {
-    store[id] = 0
-  }
+const registerAnchorRenderFunc = (id, renderFunc) => {
+  const renderFuncs = anchorsRenderFuncs[id] || []
 
-  store[id] += 1
+  renderFuncs.push(renderFunc)
+
+  anchorsRenderFuncs[id] = renderFuncs
 }
 
-const unregisterInStore = (store) => (id) => {
-  if (store[id]) {
-    store[id] -= 1
-  }
+const unregisterAnchorRenderFunc = (id, renderFunc) => {
+  anchorsRenderFuncs[id] = anchorsRenderFuncs[id].filter((f) => f !== renderFunc)
 
-  if (store[id] === 0) {
-    delete store[id]
+  if (!anchorsRenderFuncs[id].length) {
+    delete anchorsRenderFuncs[id]
   }
 }
 
-const storeElems = {}
+const portalsContent = {}
 
-const storeAnchors = {}
-
-const storePortals = {}
-
-if (process.env.NODE_ENV === 'test') {
-  global.anchorAndPortalStores = {
-    storeElems,
-    storeAnchors,
-    storePortals,
+const updateAnchors = (id) => {
+  if (anchorsRenderFuncs[id]) {
+    anchorsRenderFuncs[id].forEach((render) => render(portalsContent[id]))
   }
 }
 
-const requireElem = (id) => {
-  if (!storeElems[id]) {
-    const div = document.createElement('div')
+const registerPortal = (id, Component) => {
+  const idContent = portalsContent[id] || []
 
-    div.dataset.id = id
+  idContent.push({ Component, key: uuidv4() })
 
-    storeElems[id] = div
-  }
+  portalsContent[id] = idContent
 
-  return storeElems[id]
+  updateAnchors(id)
 }
 
-const releaseElem = (id) => {
-  if (!storeAnchors[id] && !storePortals[id]) {
-    delete storeElems[id]
+const unregisterPortal = (id, Component) => {
+  portalsContent[id] = portalsContent[id].filter((c) => c.Component !== Component)
+
+  if (!portalsContent[id].length) {
+    delete portalsContent[id]
   }
+
+  updateAnchors(id)
 }
-
-const registerAnchor = registerInStore(storeAnchors)
-
-const unregisterAnchor = unregisterInStore(storeAnchors)
-
-const registerPortal = registerInStore(storePortals)
-
-const unregisterPortal = unregisterInStore(storePortals)
 
 export const Portal = (props) => {
-  const { render, id } = props
-  const elem = useRef(requireElem(id))
-  const [mounted, setMounted] = useState(storeAnchors[id])
-  const [anchorProps, setAnchorProps] = useState()
+  const { render: Component, id } = props
+
+  const compRef = useRef(Component)
+
+  compRef.current = Component
+
+  const comp = useCallback((...args) => compRef.current(...args), [])
 
   useLayoutEffect(() => {
-    const handleMount = () => setMounted(true)
-    const handleUnmount = () => {
-      setMounted(false)
-      setAnchorProps()
-    }
-    const handleAnchorPropsUpdate = (e) => setAnchorProps(e.detail)
-
-    elem.current.addEventListener(DID_MOUNT_CUSTOM_EVENT, handleMount)
-    elem.current.addEventListener(DID_UNMOUNT_CUSTOM_EVENT, handleUnmount)
-    elem.current.addEventListener(ANCHOR_PROPS_DID_UPDATE_EVENT, handleAnchorPropsUpdate)
-
-    const portalMounetAndNeedsAnchor = new CustomEvent(PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT)
-
-    elem.current.dispatchEvent(portalMounetAndNeedsAnchor)
-
-    registerPortal(id)
+    registerPortal(id, comp)
 
     return () => {
-      elem.current.removeEventListener(DID_MOUNT_CUSTOM_EVENT, handleMount)
-      elem.current.removeEventListener(DID_UNMOUNT_CUSTOM_EVENT, handleUnmount)
-      elem.current.removeEventListener(ANCHOR_PROPS_DID_UPDATE_EVENT, handleAnchorPropsUpdate)
-
-      unregisterPortal(id)
-
-      releaseElem(id)
+      unregisterPortal(id, comp)
     }
   }, [])
 
-  return mounted && anchorProps ? ReactDOM.createPortal(render(anchorProps), elem.current) : null
+  useLayoutEffect(() => {
+    updateAnchors(id)
+  })
+
+  return null
 }
 
 export const Anchor = (props) => {
   const { id } = props
   const ref = useRef(null)
-  const elem = useRef(requireElem(id))
   const refProps = useRef(props)
   refProps.current = props
 
-  const sendAnchorPropsToPortal = useCallback(() => {
-    const anchorPropsDidUpdateEvent = new CustomEvent(ANCHOR_PROPS_DID_UPDATE_EVENT, { detail: refProps.current })
-
-    elem.current.dispatchEvent(anchorPropsDidUpdateEvent)
-  }, [])
-
-  useEffect(() => {
-    sendAnchorPropsToPortal()
-  }, [props, sendAnchorPropsToPortal])
-
-  useEffect(() => {
-    elem.current.addEventListener(PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT, sendAnchorPropsToPortal)
-
-    ref.current.appendChild(elem.current)
-
-    const customDidMountEvent = new CustomEvent(DID_MOUNT_CUSTOM_EVENT)
-
-    elem.current.dispatchEvent(customDidMountEvent)
-
-    registerAnchor(id)
-
-    return () => {
-      elem.current.removeEventListener(PORTAL_MOUNTED_AND_NEEDS_ANCHOR_PROPS_EVENT, sendAnchorPropsToPortal)
-
-      const customDidUnmountEvent = new CustomEvent(DID_UNMOUNT_CUSTOM_EVENT)
-
-      elem.current.dispatchEvent(customDidUnmountEvent)
-
-      unregisterAnchor(id)
-
-      releaseElem(id)
+  const render = useCallback((portalsContent = []) => {
+    if (ref.current) {
+      ReactDOM.render(<>{portalsContent.map(({ Component, key }) => <Component {...refProps.current} key={key} />)}</>, ref.current)
     }
   }, [])
+
+  useEffect(() => {
+    render(portalsContent[id])
+  }, [props])
+
+  useEffect(() => {
+    registerAnchorRenderFunc(id, render)
+
+    return () => {
+      unregisterAnchorRenderFunc(id, render)
+    }
+  })
 
   return React.createElement('div', { ref })
 }

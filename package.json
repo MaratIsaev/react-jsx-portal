@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Simplifies working with Portal. Simplifies the creation of complex ui layouts.",
   "main": "dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
   "keywords": [
@@ -29,6 +31,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "babel-loader": "^8.2.3",
+    "uuid": "^8.3.2",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   },
