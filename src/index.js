@@ -28,10 +28,10 @@ const updateAnchors = (id) => {
   }
 }
 
-const registerPortal = (id, Component) => {
+const registerPortal = (id, Component, __meta) => {
   const idContent = portalsContent[id] || []
 
-  idContent.push({ Component, key: uuidv4() })
+  idContent.push({ Component, key: uuidv4(), __meta })
 
   portalsContent[id] = idContent
 
@@ -49,7 +49,7 @@ const unregisterPortal = (id, Component) => {
 }
 
 export const Portal = (props) => {
-  const { render: Component, id } = props
+  const { render: Component, id, __meta } = props
 
   const compRef = useRef(Component)
 
@@ -58,7 +58,7 @@ export const Portal = (props) => {
   const comp = useCallback((...args) => compRef.current(...args), [])
 
   useLayoutEffect(() => {
-    registerPortal(id, comp)
+    registerPortal(id, comp, __meta)
 
     return () => {
       unregisterPortal(id, comp)
@@ -73,14 +73,14 @@ export const Portal = (props) => {
 }
 
 export const Anchor = (props) => {
-  const { id } = props
+  const { id, __renderPolicy = (content) => content } = props
   const ref = useRef(null)
   const refProps = useRef(props)
   refProps.current = props
 
   const render = useCallback((portalsContent = []) => {
     if (ref.current) {
-      ReactDOM.render(<>{portalsContent.map(({ Component, key }) => <Component {...refProps.current} key={key} />)}</>, ref.current)
+      ReactDOM.render(<>{__renderPolicy(portalsContent).map(({ Component, key }) => <Component {...refProps.current} key={key} />)}</>, ref.current)
     }
   }, [])
 
