@@ -1,69 +1,78 @@
-import React, { useState } from 'react'
-import { Anchor, Portal } from '../src'
+import {Anchor, Portal} from '../src'
+import React, {useState, useEffect} from 'react'
 
-const Counter = (props) => {
-  const { count, setCount, onClose } = props
+const items = [
+    {
+        name: 'Russia',
+    },
+    {
+        name: 'France',
+    },
+    {
+        name: 'Germany',
+    },
+    {
+        name: 'Norway',
+    },
+    {
+        name: 'Great Britain',
+    }
+]
 
-  return (
-    <div id="counter">
-      <div id="count">{count}</div>
-      <button id="increase" onClick={() => setCount(count + 1)}>
-        increase
-      </button>
-      <button id="decrease" onClick={() => setCount(count - 1)}>
-        decrease
-      </button>
-      <button id="close" onClick={onClose}>
-        close
-      </button>
-    </div>
-  )
+const Details = (props) => {
+    const { name, onClose, portalCount, appCount } = props
+    const [count, setCount] = useState(0)
+
+    useEffect(() => () => {
+        onClose()
+    }, [])
+
+    return (
+        <div className={`details ${name}`}>
+            <button className="closeDetails" onClick={onClose}>Close</button>
+            <h1>Name: {name}</h1>
+            <div className={`appCounter ${name}`}>{appCount}</div>
+            <div className={`cellCounter ${name}`}>{portalCount}</div>
+            <div className={`detailsCounter ${name}`}>{count}</div>
+            <button onClick={() => setCount(count + 1)} className={`detailsCountButton ${name}`}>counter</button>
+        </div>
+    )
 }
 
-export const App = (props) => {
-  const { initCount, anchorFirst, id, anchorVisible, portalVisible } = props
-  const [isAnchorVisible, setIsAnchorVisible] = useState(anchorVisible)
-  const [isPortalVisible, setIsPortalVisible] = useState(portalVisible)
-  const [count, setCount] = useState(initCount)
-  const handlePortalClose = () => setIsAnchorVisible(false)
+const Cell = (props) => {
+    const { name } = props
+    const [isDetailsShown, setIsDetailsShown] = useState(false)
+    const [count, setCount] = useState(0)
 
-  return (
-    <div>
-      <div>Counter</div>
-      <button id="openAnchor" onClick={() => setIsAnchorVisible(true)}>
-        openAnchor
-      </button>
-      <button id="openPortal" onClick={() => setIsPortalVisible(true)}>
-        openPortal
-      </button>
-      <button id="closePortal" onClick={() => setIsPortalVisible(false)}>
-        closePortal
-      </button>
-      {anchorFirst ? (
+    return (
         <>
-          {isAnchorVisible && <Anchor id={id} count={count} setCount={setCount} onClose={handlePortalClose} />}
-          {isPortalVisible && (
-            <Portal
-              id={id}
-              render={({ count, setCount, handlePortalClose }) => (
-                <Counter count={count} setCount={setCount} onClose={handlePortalClose} />
-              )}
-            />
-          )}
+            <div className={`cell ${name}`} onClick={() => setIsDetailsShown(!isDetailsShown)}>{name}</div>
+            <button className={`cellCountButton ${name}`} onClick={() => setCount(count + 1)}>counter</button>
+            {isDetailsShown && <Portal id="details" render={({ appCount }) => (<Details name={name} appCount={appCount} portalCount={count} onClose={() => setIsDetailsShown(false)} />)} />}
         </>
-      ) : (
-        <>
-          {isPortalVisible && (
-            <Portal
-              id={id}
-              render={({ count, setCount, handlePortalClose }) => (
-                <Counter count={count} setCount={setCount} onClose={handlePortalClose} />
-              )}
-            />
-          )}
-          {isAnchorVisible && <Anchor id={id} count={count} setCount={setCount} onClose={handlePortalClose} />}
-        </>
-      )}
-    </div>
-  )
+    )
 }
+
+const showLastRenderPolicy = (content) => {
+    const { length } = content
+
+    if (length) {
+        return [content[length - 1]]
+    }
+
+    return content
+}
+
+function App() {
+    const [count, setCount] = useState(0)
+
+    return (
+        <div className="container">
+            <button className="appCountButton" onClick={() => setCount(count + 1)}>counter</button>
+            <div className="list">{items.map(({ name }) => <Cell name={name} key={name} />)}</div>
+            <div className="detailsAnchor"><Anchor appCount={count} __renderPolicy={showLastRenderPolicy} id="details"/></div>
+        </div>
+    )
+}
+
+export default App

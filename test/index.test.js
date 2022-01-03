@@ -1,10 +1,7 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { render } from 'react-dom'
-import { App } from './app.test'
-
-const INIT_COUNT = 12345
-const ID = 'someId'
+import App from './app.test'
 
 let root = null
 
@@ -21,141 +18,87 @@ afterEach(() => {
   })
 })
 
-const testAnchorAndPortl = (isAnchorFirst) => {
+test('Проверяем корректность прокидывания пропсов', () => {
   act(() => {
-    render(<App id={ID} anchorVisible portalVisible initCount={INIT_COUNT} anchorFirst={isAnchorFirst} />, root)
+    render(<App />, root)
   })
 
-  //Проверяем, что портал появился
-  let portal = document.querySelector('#counter')
+  const FIRST_COUNTRY_NAME = 'Russia'
+  const SECOND_COUNTRY_NAME = 'France'
 
-  expect(portal).toBe
+  //Находим первую ячейку
+  let cell = document.querySelector(`.cell.${FIRST_COUNTRY_NAME}`)
 
-  //Проверяем, что значение count равно начальному
-  let count = document.querySelector('#count')
+  expect(cell).toBe
 
-  expect(count.innerHTML).toBe(String(INIT_COUNT))
+  //Открываем детальную информацию
+  cell.click()
+  let details = document.querySelector(`.cell.${FIRST_COUNTRY_NAME}`)
 
-  //Проверяем что пропсы нормально передались в Portal
-  //Для этого сначала увеличим счетчик
-  let increase = document.querySelector('#increase')
+  expect(details).toBe
 
-  increase.click()
+  //Проверяем что значения счётчиков из App, Cell, Details равны 0
+  let appCounter = document.querySelector(`.appCounter.${FIRST_COUNTRY_NAME}`)
+  let cellCounter = document.querySelector(`.cellCounter.${FIRST_COUNTRY_NAME}`)
+  let detailsCounter = document.querySelector(`.detailsCounter.${FIRST_COUNTRY_NAME}`)
 
-  expect(count.innerHTML).toBe(String(INIT_COUNT + 1))
+  expect(appCounter.innerHTML).toBe('0')
+  expect(cellCounter.innerHTML).toBe('0')
+  expect(detailsCounter.innerHTML).toBe('0')
 
-  //Потом уменьшим
-  const decrease = document.querySelector('#decrease')
+  //Увеличиваем все счётчики на 1 и проверяем корректност пропсов
+  let appCountButton = document.querySelector('.appCountButton')
+  let cellCountButton = document.querySelector(`.cellCountButton.${FIRST_COUNTRY_NAME}`)
+  let detailsCountButton = document.querySelector(`.detailsCountButton.${FIRST_COUNTRY_NAME}`)
 
-  decrease.click()
-  decrease.click()
+  appCountButton.click()
+  cellCountButton.click()
+  detailsCountButton.click()
 
-  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  expect(appCounter.innerHTML).toBe('1')
+  expect(cellCounter.innerHTML).toBe('1')
+  expect(detailsCounter.innerHTML).toBe('1')
 
-  //Скрыть Anchor проверить что Portal пропал
-  let close = document.querySelector('#close')
+  //Переключаемся на другую ячейку
+  cell = document.querySelector(`.cell.${SECOND_COUNTRY_NAME}`)
 
-  close.click()
+  //Открываем детальную информацию
+  cell.click()
+  details = document.querySelector(`.cell.${SECOND_COUNTRY_NAME}`)
 
-  portal = document.querySelector('#counter')
+  expect(details).toBe
 
-  expect(portal).not.toBe
+  //Проверяем что значения счётчиков из App, Cell, Details равны 1, 0, 0 соответственно
+  appCounter = document.querySelector(`.appCounter.${SECOND_COUNTRY_NAME}`)
+  cellCounter = document.querySelector(`.cellCounter.${SECOND_COUNTRY_NAME}`)
+  detailsCounter = document.querySelector(`.detailsCounter.${SECOND_COUNTRY_NAME}`)
 
-  //Показать Anchor проверить, что Portal появился
-  const openAnchor = document.querySelector('#openAnchor')
+  expect(appCounter.innerHTML).toBe('1')
+  expect(cellCounter.innerHTML).toBe('0')
+  expect(detailsCounter.innerHTML).toBe('0')
 
-  openAnchor.click()
+  //Увеличиваем все счётчики на 1 и проверяем корректност пропсов
+  cellCountButton = document.querySelector(`.cellCountButton.${SECOND_COUNTRY_NAME}`)
+  detailsCountButton = document.querySelector(`.detailsCountButton.${SECOND_COUNTRY_NAME}`)
 
-  portal = document.querySelector('#counter')
+  appCountButton.click()
+  cellCountButton.click()
+  detailsCountButton.click()
 
-  expect(portal).toBe
+  expect(appCounter.innerHTML).toBe('2')
+  expect(cellCounter.innerHTML).toBe('1')
+  expect(detailsCounter.innerHTML).toBe('1')
 
-  count = document.querySelector('#count')
+  //Возвращаемся к первой ячейке
+  cell = document.querySelector(`.cell.${FIRST_COUNTRY_NAME}`)
 
-  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
+  cell.click()
 
-  //Прячем Portal
-  let closePortal = document.querySelector('#closePortal')
+  appCounter = document.querySelector(`.appCounter.${FIRST_COUNTRY_NAME}`)
+  cellCounter = document.querySelector(`.cellCounter.${FIRST_COUNTRY_NAME}`)
+  detailsCounter = document.querySelector(`.detailsCounter.${FIRST_COUNTRY_NAME}`)
 
-  closePortal.click()
-
-  portal = document.querySelector('#counter')
-
-  expect(portal).not.toBe
-
-  //Показываем Portal
-  const openPortal = document.querySelector('#openPortal')
-
-  openPortal.click()
-
-  portal = document.querySelector('#counter')
-
-  expect(portal).toBe
-
-  count = document.querySelector('#count')
-
-  expect(count.innerHTML).toBe(String(INIT_COUNT - 1))
-
-  increase = document.querySelector('#increase')
-
-  increase.click()
-
-  expect(count.innerHTML).toBe(String(INIT_COUNT))
-}
-
-test('Anchor и Portal появляются одновременно, но Anchor выше в дереве', () => testAnchorAndPortl(true))
-
-test('Anchor и Portal появляются одновременно, но Portal выше в дереве', () => testAnchorAndPortl(false))
-
-test('Проверяем что сторы очищаются корректно и нет утечек памяти', () => {
-  const {
-    storeElems,
-    storeAnchors,
-    storePortals,
-  } = global.anchorAndPortalStores
-
-  //Изначально в сторах ничего нет
-  expect(storeElems[ID]).not.toBe
-  expect(storeAnchors[ID]).not.toBe
-  expect(storePortals[ID]).not.toBe
-
-  //Монтируем компонент
-  act(() => {
-    render(<App id={ID} anchorVisible portalVisible initCount={INIT_COUNT} anchorFirst />, root)
-  })
-
-  //После того как отрендерили один Portal и один Anchor
-  expect(storeElems[ID]).toBe
-  expect(storeAnchors[ID]).toBe(1)
-  expect(storePortals[ID]).toBe(1)
-
-  //Скрываем Portal
-  act(() => {
-    render(<App id={ID} anchorVisible initCount={INIT_COUNT} anchorFirst />, root)
-  })
-
-  //После того как скрыли Portal
-  expect(storeElems[ID]).toBe
-  expect(storeAnchors[ID]).toBe(1)
-  expect(storePortals[ID]).not.toBe
-
-  //Скрываем Anchor
-  act(() => {
-    render(<App id={ID} portalVisible initCount={INIT_COUNT} anchorFirst />, root)
-  })
-
-  //После того как скрыли Anchor
-  expect(storeElems[ID]).toBe
-  expect(storeAnchors[ID]).not.toBe
-  expect(storePortals[ID]).toBe(1)
-
-  //Скрываем Anchor и Portal
-  act(() => {
-    render(<App id={ID} initCount={INIT_COUNT} anchorFirst />, root)
-  })
-
-  //После того как скрыли Portal и Anchor в сторах ничего не должно оставаться
-  expect(storeElems[ID]).not.toBe
-  expect(storeAnchors[ID]).not.toBe
-  expect(storePortals[ID]).not.toBe
+  expect(appCounter.innerHTML).toBe('2')
+  expect(cellCounter.innerHTML).toBe('1')
+  expect(detailsCounter.innerHTML).toBe('0')
 })
