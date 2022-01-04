@@ -1,5 +1,5 @@
 {
-  "name": "wormhole/react-jsx-portal",
+  "name": "react-jsx-portal",
   "version": "1.0.0",
   "description": "Simplifies working with Portal. Simplifies the creation of complex ui layouts.",
   "main": "dist/index.js",
