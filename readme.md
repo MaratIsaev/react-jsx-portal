@@ -66,6 +66,8 @@ in Portal, the prop __meta, and in the Anchor component, the prop __renderPolicy
         {isSecondOpen && <Portal __meta={{ priority: 10 }} id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
     </App>
 
+Try on codesandbox: https://codesandbox.io/s/react-jsx-portal-yp34n
+
 Данная библиотека отлично подойдёт как для создания модалок и попаутов, так и для решения куда более 
 сложных задач, таких как создание сложных компонентов интерфейса, когда компоновка требует отображения частей
 компонента в разных местах макета, что ведёт к протеканию состояния компонента в вышестоящие компоненты и props hell.
@@ -132,3 +134,5 @@ in Portal, the prop __meta, and in the Anchor component, the prop __renderPolicy
         {isOpen && <Portal __meta={{ priority: 1 }} id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
         {isSecondOpen && <Portal __meta={{ priority: 10 }} id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
     </App>
+
+Попробовать: Try on codesandbox: https://codesandbox.io/s/react-jsx-portal-yp34n
