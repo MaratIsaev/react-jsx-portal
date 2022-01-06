@@ -1,3 +1,71 @@
+This library is perfect both for creating modals and popouts, as well as for solutions for more complex tasks, such as complex interface components, when the layout requires the presentation of parts of the component in different
+places of the layout, which leads to the flow of the component state into the upstream components and props hell.
+
+### Features
+
+
+> - does not use DOM search. No document.querySelector, document.getElementById, ... No more need to search for elements in HTML markup, JSX ONLY
+> - predictability and declarativeness. Even if the component inside which the portal should be rendered is loaded lazily, you have nothing to worry about, as soon as this component is loaded, the render will happen automatically
+> - broadcasting. The same component can be rendered in several places at once.
+> - the ability to pass props from the component where the portal is rendered directly to the portal, avoiding props hell and without using the Context API and its attendant restrictions
+
+### Usage
+
+To work, you need two components: Anchor and Portal. Anchor is a jsx element where Portal will be rendered. Give them the same id to match them.
+In the render props of the Portal component, pass a render function that takes as an argument an object with props that the Anchor component passes to it.
+
+    <App>
+        <Anchor id="someId" someProp="My name is ..."} />
+        ...
+        {isOpen && <Portal id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+    </App>
+
+
+If you need to draw the same portal in two places, just add another Anchor with the same id as Portal. Each rendered component will receive props from its Anchor component.
+
+    <App>
+        <Anchor id="someId" someProp="My name is ..."} />
+        ...
+        <Anchor id="someId" someProp="What a wonderful place!?"} />
+        ...
+        {isOpen && <Portal id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+    </App>
+
+Render multiple Portal's to multiple Anchor's.
+
+    <App>
+        <Anchor id="someId" someProp="My name is ..."} />
+        ...
+        <Anchor id="someId" someProp="What a wonderful place!?"} />
+        ...
+        {isOpen && <Portal id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+        {isSecondOpen && <Portal id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+    </App>
+
+When rendering several Portal's in one Anchor, you can prioritize which one should be rendered now. To do this, pass
+in Portal, the prop __meta, and in the Anchor component, the prop __renderPolicy is a function that receives an array [{Component, __meta}, ...] as input and returns the same array.
+
+    const renderByPriority = (arr) => {
+        const { length } = arr
+        
+        if (length) {
+            const sortedByPriority = arr.sort((a, b) => b.__meta.priority - a.__meta.priority)
+
+            return [sortedByPriority[0]]
+        }
+    
+        return arr
+    }
+
+    ...
+
+    <App>
+        <Anchor __renderPolicy={renderByPriority} id="someId" someProp="My name is ..."} />
+        ...
+        {isOpen && <Portal __meta={{ priority: 1 }} id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+        {isSecondOpen && <Portal __meta={{ priority: 10 }} id="someId" render={({ someProp }) => (<div>{someProp}</div>)} />}
+    </App>
+
 Данная библиотека отлично подойдёт как для создания модалок и попаутов, так и для решения куда более 
 сложных задач, таких как создание сложных компонентов интерфейса, когда компоновка требует отображения частей
 компонента в разных местах макета, что ведёт к протеканию состояния компонента в вышестоящие компоненты и props hell.
