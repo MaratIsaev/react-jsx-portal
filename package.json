@@ -8,6 +8,10 @@
   ],
   "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaratIsaev/react-jsx-portal.git"
+  },
   "keywords": [
     "react",
     "react-component",
