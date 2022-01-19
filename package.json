@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "files": [
     "dist",
-    "src/index.d.ts"
+    "index.d.ts"
   ],
   "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
