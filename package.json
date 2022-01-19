@@ -3,9 +3,9 @@
   "version": "1.1.0",
   "description": "Simplifies working with Portal. Simplifies the creation of complex ui layouts.",
   "main": "dist/index.js",
-  "types": "dist/main.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/index.d.ts"
   ],
   "author": "Marat Isaev <maratisaev1994@gmail.com>",
   "license": "ISC",
@@ -44,7 +44,6 @@
     "@babel/preset-react": "^7.16.5",
     "babel-jest": "^27.4.5",
     "babel-loader": "^8.2.3",
-    "copy-webpack-plugin": "^10.2.0",
     "eslint": "^8.5.0",
     "eslint-plugin-react": "^7.28.0",
     "jest": "^27.4.5",
