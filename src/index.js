@@ -94,7 +94,7 @@ export const Anchor = (props) => {
     return () => {
       unregisterAnchorRenderFunc(id, render)
     }
-  })
+  }, [])
 
   return React.createElement('div', { ref })
 }
