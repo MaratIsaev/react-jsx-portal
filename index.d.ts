@@ -10,6 +10,6 @@ type ContentNode = {
   __meta?: unknown
 }
 
-declare const Anchor: FC<Props & { __renderPolicy: (arr: ContentNode[]) => ContentNode[], id: Id }>
+declare const Anchor: FC<Props & { __renderPolicy?: (arr: ContentNode[]) => ContentNode[], id: Id }>
 
 declare const Portal: FC<{ __meta?: Record<string, unknown>, id: Id, render: FC}>
