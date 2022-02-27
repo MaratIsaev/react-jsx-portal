@@ -1,100 +1,99 @@
-import React, { useLayoutEffect, useEffect, useRef, useCallback } from 'react'
+import React, { useLayoutEffect, useEffect, useRef, useReducer, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { v4 as uuidv4 } from 'uuid'
 
-const anchorsRenderFuncs = {}
+const Anchors = {}
+const Portals = {}
 
-const registerAnchorRenderFunc = (id, renderFunc) => {
-  const renderFuncs = anchorsRenderFuncs[id] || []
+export const Anchor = (props) => {
+  const { id, __renderPolicy = (content) => content, ...anchorProps } = props
+  const [isAnchorRegistered, setIsAnchorRegistered] = useState(false)
+  const [, forceUpdate] = useReducer(() => ({}), {})
+  const { current: anchorUUID } = useRef(uuidv4())
+  const ref = useRef(null)
+  const anchor = useRef({ anchorUUID, forceUpdate, allowedPortalsUUID: [] }) // allowedPortalsUUID - порталы, которые нужно отрендерить в Anchor, после применения к списку Portals __renderPolicy
 
-  renderFuncs.push(renderFunc)
+  anchor.current.props = anchorProps
 
-  anchorsRenderFuncs[id] = renderFuncs
-}
+  useEffect(() => {
+    const portals = Portals[id] || []
+    anchor.current.allowedPortalsUUID = __renderPolicy(portals).map((portal) => portal.portalUUID)
+    anchor.current.container = ref.current
 
-const unregisterAnchorRenderFunc = (id, renderFunc) => {
-  anchorsRenderFuncs[id] = anchorsRenderFuncs[id].filter((f) => f !== renderFunc)
+    if (Anchors[id]) {
+      Anchors[id].push(anchor.current)
+    } else {
+      Anchors[id] = [anchor.current]
+    }
 
-  if (!anchorsRenderFuncs[id].length) {
-    delete anchorsRenderFuncs[id]
-  }
-}
+    setIsAnchorRegistered(true)
 
-const portalsContent = {}
+    return () => {
+      Anchors[id] = Anchors[id].filter((anchor) => anchor.anchorUUID !== anchorUUID)
 
-const updateAnchors = (id) => {
-  if (anchorsRenderFuncs[id]) {
-    anchorsRenderFuncs[id].forEach((render) => render(portalsContent[id]))
-  }
-}
+      if (!Anchors[id].length) {
+        delete Anchors[id]
+      }
+    }
+  }, [])
 
-const registerPortal = (id, Component, __meta) => {
-  const idContent = portalsContent[id] || []
+  useLayoutEffect(() => {
+    if (isAnchorRegistered && Portals[id]) {
+      const portals = Portals[id] || []
+      anchor.current.allowedPortalsUUID = __renderPolicy(portals).map((portal) => portal.portalUUID)
 
-  idContent.push({ Component, key: uuidv4(), __meta })
+      Portals[id].forEach((portal) => portal.forceUpdate())
+    }
+  })
 
-  portalsContent[id] = idContent
-
-  updateAnchors(id)
-}
-
-const unregisterPortal = (id, Component) => {
-  portalsContent[id] = portalsContent[id].filter((c) => c.Component !== Component)
-
-  if (!portalsContent[id].length) {
-    delete portalsContent[id]
-  }
-
-  updateAnchors(id)
+  return React.createElement('div', { ref })
 }
 
 export const Portal = (props) => {
   const { render: Component, id, __meta } = props
+  const { current: portalUUID } = useRef(uuidv4())
+  const [, forceUpdate] = useReducer(() => ({}), {})
+  const [isPortalRegistered, setIsPortalRegistered] = useState(false)
 
-  const compRef = useRef(Component)
-
-  compRef.current = Component
-
-  const comp = useCallback((...args) => compRef.current(...args), [])
-
+  // прежде, чем что-либо рендерить все компоненты Anchor и Portal должны быть зарегистрированы
   useLayoutEffect(() => {
-    registerPortal(id, comp, __meta)
+    const portal = { portalUUID, forceUpdate, __meta }
+
+    if (Portals[id]) {
+      Portals[id].push(portal)
+    } else {
+      Portals[id] = [portal]
+    }
+
+    // запускаем Anchors чтобы они применили свои __renderPolicy, до того как мы порталируем в них своё содержимое
+    if (Anchors[id]) {
+      Anchors[id].forEach((Anchor) => Anchor.forceUpdate())
+    }
+
+    setIsPortalRegistered(true)
 
     return () => {
-      unregisterPortal(id, comp)
+      Portals[id] = Portals[id].filter((portal) => portal.portalUUID !== portalUUID)
+
+      if (!Portals[id].length) {
+        delete Portals[id]
+      }
     }
   }, [])
 
-  useLayoutEffect(() => {
-    updateAnchors(id)
+  // если портал не зарегистрирован, то ничего не рендерим
+  if (!isPortalRegistered) {
+    return null
+  }
+
+  // если нет соответствующего Anchor, то ничего не рендерим
+  if (!Anchors[id]) {
+    return null
+  }
+
+  return Anchors[id].map((Anchor) => {
+    const { container, props, allowedPortalsUUID } = Anchor
+
+    return allowedPortalsUUID.includes(portalUUID) ? ReactDOM.createPortal(Component(props), container) : null
   })
-
-  return null
-}
-
-export const Anchor = (props) => {
-  const { id, __renderPolicy = (content) => content } = props
-  const ref = useRef(null)
-  const refProps = useRef(props)
-  refProps.current = props
-
-  const render = useCallback((portalsContent = []) => {
-    if (ref.current) {
-      ReactDOM.render(<>{__renderPolicy(portalsContent).map(({ Component, key }) => <Component {...refProps.current} key={key} />)}</>, ref.current)
-    }
-  }, [])
-
-  useEffect(() => {
-    render(portalsContent[id])
-  }, [props])
-
-  useEffect(() => {
-    registerAnchorRenderFunc(id, render)
-
-    return () => {
-      unregisterAnchorRenderFunc(id, render)
-    }
-  }, [])
-
-  return React.createElement('div', { ref })
 }
